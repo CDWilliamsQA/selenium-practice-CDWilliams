@@ -1,23 +1,22 @@
+import pytest
 from pages.google_page import GooglePage
 from pages.results_page import ResultsPage
 
 
-# ✅ PASS TEST
-def test_google_title(driver):
-    google = GooglePage(driver)
-    google.open()
-    assert "Google" in driver.title
-
-
-# ❌ FAIL TEST (forces screenshot via conftest hook)
-def test_google_search_failure(driver):
-    google = GooglePage(driver)
-    google.open()
-    google.handle_consent()
-    google.search("Selenium Python tutorial")
+def test_form_submission(driver):
+    page = GooglePage(driver)
+    page.open()
+    page.handle_consent()
+    page.search("Automation Test")
 
     results = ResultsPage(driver)
-    assert results.results_exist() # this should PASS
+    assert results.results_exist(), "Form submission did not succeed"
 
-    # Intentionally wrong assertion to force FAIL + screenshot
-    assert "THIS_TEXT_DOES_NOT_EXIST" in driver.page_source
+
+def test_url_changed_after_submit(driver):
+    page = GooglePage(driver)
+    page.open()
+    page.search("Hello")
+
+    assert "submitted" in driver.current_url or "message" in driver.page_source
+

@@ -1,41 +1,34 @@
 from utils.logger import get_logger
-logger = get_logger(__name__)
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+logger = get_logger(__name__)
 
-class GooglePage:
+
+class GooglePage: # name doesn't matter
+    URL = "https://www.selenium.dev/selenium/web/web-form.html"
+
+    TEXT_INPUT = (By.NAME, "my-text")
+    SUBMIT_BUTTON = (By.CSS_SELECTOR, "button")
 
     def __init__(self, driver):
         self.driver = driver
         self.wait = WebDriverWait(driver, 10)
 
-    SEARCH_BOX = (By.NAME, "q")
-    ACCEPT_BUTTON = (By.XPATH, "//button/div[contains(text(),'Accept all')]")
-
     def open(self):
-        logger.info("Opening Google homepage")
-        self.driver.get("https://www.google.com")
+        logger.info("Opening Selenium test form page")
+        self.driver.get(self.URL)
 
     def handle_consent(self):
-        try:
-            logger.info("Checking for consent pop-up")
-            accept_btn = self.wait.until(
-                EC.element_to_be_clickable(self.ACCEPT_BUTTON)
-            )
-            accept_btn.click()
-            logger.info("Consent pop-up handled")
-        except Exception:
-            logger.info("No consent pop-up present")
+        # No consent on this page — keep method for framework consistency
+        pass
 
     def search(self, text):
-        logger.info(f"Searching Google for: {text}")
-        search_box = self.wait.until(
-            EC.visibility_of_element_located(self.SEARCH_BOX)
-        )
-        search_box.send_keys(text)
-        search_box.submit()
-        logger.info("Search submitted")
+        logger.info(f"Entering text: {text}")
+        input_box = self.wait.until(EC.visibility_of_element_located(self.TEXT_INPUT))
+        input_box.clear()
+        input_box.send_keys(text)
 
+        logger.info("Submitting form")
+        self.driver.find_element(*self.SUBMIT_BUTTON).click()
